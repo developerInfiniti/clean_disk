@@ -2450,7 +2450,13 @@ class _DetailsPane extends StatelessWidget {
                             message: l10n.movedToTrashDetailsHint,
                           ),
                         ],
-                        const SizedBox(height: 22),
+                        const SizedBox(height: 12),
+                        _DetailsAssistantCard(
+                          details: details,
+                          alreadyQueued: alreadyQueued,
+                          movedToTrash: movedToTrash,
+                        ),
+                        const SizedBox(height: 16),
                         _DetailLine(
                           label: l10n.detailsTypeLabel,
                           value: _nodeKindText(l10n, details.summary.kind),
@@ -2598,6 +2604,331 @@ class _DetailsPane extends StatelessWidget {
       ),
     );
   }
+}
+
+class _DetailsAssistantCard extends StatelessWidget {
+  const _DetailsAssistantCard({
+    required this.details,
+    required this.alreadyQueued,
+    required this.movedToTrash,
+  });
+
+  final NodeDetails details;
+  final bool alreadyQueued;
+  final bool movedToTrash;
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = details.summary;
+    final risk = _assistantRisk(summary, details.issues.length, movedToTrash);
+    final headline = _assistantHeadline(summary, details.issues.length);
+    final advice = _assistantAdvice(
+      summary,
+      details.issues.length,
+      movedToTrash,
+    );
+    final action = movedToTrash
+        ? 'Уже перемещено'
+        : alreadyQueued
+        ? 'В списке проверки'
+        : 'Добавить в список';
+
+    return Container(
+      key: const ValueKey('details-ai-assistant-card'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _ScanColors.innerPanel,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _ScanColors.violet.withAlpha(115)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: _ScanColors.violet.withAlpha(22),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: _ScanColors.violet.withAlpha(80)),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome,
+                  color: _ScanColors.violet,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _SectionCaption('AI РЕВЬЮ'),
+                    const SizedBox(height: 2),
+                    Text(
+                      headline,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _bodyStyle(context).copyWith(
+                        color: _ScanColors.text,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              _DetailsAssistantPill(
+                text: risk.label,
+                color: risk.color,
+                icon: risk.icon,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              _DetailsAssistantMeta(
+                icon: Icons.data_usage,
+                label: _formatSize(summary.size),
+              ),
+              _DetailsAssistantMeta(
+                icon: Icons.folder_copy_outlined,
+                label: '${summary.childCount} элементов',
+              ),
+              _DetailsAssistantMeta(
+                icon: alreadyQueued
+                    ? Icons.check_circle_outline
+                    : Icons.playlist_add_check,
+                label: action,
+                accent: alreadyQueued ? _ScanColors.cyan : _ScanColors.blue,
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            decoration: BoxDecoration(
+              color: _ScanColors.panel,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: _ScanColors.border),
+            ),
+            child: Text(
+              advice,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: _bodyStyle(
+                context,
+              ).copyWith(color: _ScanColors.textSoft, height: 1.2),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const Icon(Icons.history, size: 15, color: _ScanColors.textSoft),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  'История: проверял ${summary.name}, нашел ${details.issues.length} предупрежд.',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: _bodyStyle(
+                    context,
+                  ).copyWith(color: _ScanColors.textSoft),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            height: 34,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              color: _ScanColors.input,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: _ScanColors.border),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.chat_bubble_outline,
+                  size: 16,
+                  color: _ScanColors.cyan,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Спросить, что безопасно чистить...',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: _bodyStyle(
+                      context,
+                    ).copyWith(color: _ScanColors.textSoft),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailsAssistantPill extends StatelessWidget {
+  const _DetailsAssistantPill({
+    required this.text,
+    required this.color,
+    required this.icon,
+  });
+
+  final String text;
+  final Color color;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 28,
+      padding: const EdgeInsets.symmetric(horizontal: 9),
+      decoration: BoxDecoration(
+        color: color.withAlpha(18),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withAlpha(95)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 5),
+          Text(
+            text,
+            style: _bodyStyle(
+              context,
+            ).copyWith(color: color, fontWeight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DetailsAssistantMeta extends StatelessWidget {
+  const _DetailsAssistantMeta({
+    required this.icon,
+    required this.label,
+    this.accent = _ScanColors.textSoft,
+  });
+
+  final IconData icon;
+  final String label;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 28,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      decoration: BoxDecoration(
+        color: _ScanColors.panel,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _ScanColors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: accent),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: _bodyStyle(context).copyWith(color: _ScanColors.text),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+final class _AssistantRisk {
+  const _AssistantRisk({
+    required this.label,
+    required this.color,
+    required this.icon,
+  });
+
+  final String label;
+  final Color color;
+  final IconData icon;
+}
+
+_AssistantRisk _assistantRisk(
+  NodePageItem summary,
+  int issueCount,
+  bool movedToTrash,
+) {
+  if (movedToTrash) {
+    return const _AssistantRisk(
+      label: 'Готово',
+      color: _ScanColors.cyan,
+      icon: Icons.check_circle_outline,
+    );
+  }
+  if (issueCount > 0 || summary.flags.system) {
+    return const _AssistantRisk(
+      label: 'Высокий риск',
+      color: _ScanColors.pink,
+      icon: Icons.warning_amber_rounded,
+    );
+  }
+  if (summary.flags.hidden ||
+      summary.flags.symlink ||
+      summary.kind == NodeKind.directory && summary.childCount > 40) {
+    return const _AssistantRisk(
+      label: 'Проверить',
+      color: _ScanColors.yellow,
+      icon: Icons.rule,
+    );
+  }
+  return const _AssistantRisk(
+    label: 'Низкий риск',
+    color: _ScanColors.cyan,
+    icon: Icons.verified_outlined,
+  );
+}
+
+String _assistantHeadline(NodePageItem summary, int issueCount) {
+  if (issueCount > 0) {
+    return 'Есть предупреждения, нужна ручная проверка';
+  }
+  if (summary.flags.system) {
+    return 'Системный элемент лучше не трогать';
+  }
+  if (summary.kind == NodeKind.file) {
+    return 'Файл можно оценить отдельно';
+  }
+  return 'Разбирать через дочерние папки';
+}
+
+String _assistantAdvice(
+  NodePageItem summary,
+  int issueCount,
+  bool movedToTrash,
+) {
+  if (movedToTrash) {
+    return 'Элемент уже в корзине. Перед очисткой корзины проверь, не нужен ли откат.';
+  }
+  if (issueCount > 0 || summary.flags.system) {
+    return 'Не удаляй целиком. Открой путь и добавляй в список только понятные временные файлы.';
+  }
+  if (summary.kind == NodeKind.directory) {
+    return 'Начни с самых крупных подпапок. Корень лучше держать как контекст, а не как цель удаления.';
+  }
+  return 'Проверь расширение и дату изменения. Если файл знакомый, добавляй в список проверки.';
 }
 
 class _CollapsedDetailsRail extends StatelessWidget {
