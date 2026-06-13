@@ -1929,6 +1929,8 @@ class _TargetRail extends StatelessWidget {
                   ),
               ],
               const SizedBox(height: 12),
+              _AssistantRailPanel(store: store, activeTarget: activeTarget),
+              const SizedBox(height: 12),
               _PermissionProofCard(
                 proof: store.runtimeProof,
                 onProbe: onPermissionProbe,
@@ -1941,6 +1943,222 @@ class _TargetRail extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AssistantRailPanel extends StatelessWidget {
+  const _AssistantRailPanel({required this.store, required this.activeTarget});
+
+  final ScanWorkspaceStore store;
+  final ScanTarget activeTarget;
+
+  @override
+  Widget build(BuildContext context) {
+    final summary = _metricSummary(store);
+    final selected = store.selectedDetails?.summary;
+    final focus = selected ?? summary.largest;
+    final focusName = focus?.name ?? _targetDisplayName(activeTarget);
+    final focusSize = focus == null
+        ? _metricSummarySizeText(store)
+        : _formatSize(focus.size);
+    final hasScanData = store.hasReadableSnapshot || summary.hasData;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: _ScanColors.panel.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: _ScanColors.cyan.withValues(alpha: 0.34)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: _ScanColors.cyan.withValues(alpha: 0.14),
+                  borderRadius: BorderRadius.circular(7),
+                  border: Border.all(
+                    color: _ScanColors.cyan.withValues(alpha: 0.42),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.auto_awesome,
+                  color: _ScanColors.cyan,
+                  size: 16,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'AI-помощник',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _bodyStyle(context).copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    Text(
+                      hasScanData ? 'История и подсказки' : 'Ждет скан',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: _bodyStyle(
+                        context,
+                      ).copyWith(color: _ScanColors.textSoft, fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _AssistantHint(
+            icon: Icons.saved_search_outlined,
+            title: hasScanData ? focusName : 'Сначала быстрый скан',
+            value: focusSize ?? 'Подскажу после результата',
+            accent: _ScanColors.violet,
+          ),
+          const SizedBox(height: 8),
+          _AssistantHint(
+            icon: Icons.cleaning_services_outlined,
+            title: hasScanData ? 'Не удалять сразу' : 'Безопасный режим',
+            value: hasScanData ? 'Сначала список проверки' : 'Только советы',
+            accent: _ScanColors.cyan,
+          ),
+          const SizedBox(height: 12),
+          const _SectionCaption('ИСТОРИЯ'),
+          const SizedBox(height: 8),
+          _AssistantHistoryItem(
+            label: 'Что занимает место?',
+            active: hasScanData,
+          ),
+          _AssistantHistoryItem(
+            label: 'Можно ли чистить $focusName?',
+            active: false,
+          ),
+          const SizedBox(height: 10),
+          Container(
+            height: 34,
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              color: _ScanColors.input,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: _ScanColors.border),
+            ),
+            child: Row(
+              children: [
+                const Icon(
+                  Icons.chat_bubble_outline,
+                  color: _ScanColors.textSoft,
+                  size: 15,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Спросить про очистку...',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: _bodyStyle(
+                      context,
+                    ).copyWith(color: _ScanColors.textSoft, fontSize: 12),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AssistantHint extends StatelessWidget {
+  const _AssistantHint({
+    required this.icon,
+    required this.title,
+    required this.value,
+    required this.accent,
+  });
+
+  final IconData icon;
+  final String title;
+  final String value;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, color: accent, size: 15),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: _bodyStyle(
+                  context,
+                ).copyWith(color: _ScanColors.text, fontSize: 12),
+              ),
+              Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: _bodyStyle(
+                  context,
+                ).copyWith(color: _ScanColors.textSoft, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AssistantHistoryItem extends StatelessWidget {
+  const _AssistantHistoryItem({required this.label, required this.active});
+
+  final String label;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        children: [
+          Icon(
+            active ? Icons.history_toggle_off : Icons.history,
+            color: active ? _ScanColors.cyan : _ScanColors.textSoft,
+            size: 14,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: _bodyStyle(context).copyWith(
+                color: active ? _ScanColors.text : _ScanColors.textSoft,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
