@@ -1381,48 +1381,62 @@ class _WideWorkspaceState extends State<_WideWorkspace> {
         ),
         const _Divider.vertical(),
         Expanded(
-          child: Scrollbar(
-            controller: _scrollController,
-            notificationPredicate: (notification) => notification.depth == 0,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
-              child: Column(
-                children: [
-                  if (_shouldShowMetricStrip(widget.store)) ...[
-                    _MetricStrip(store: widget.store),
-                    const SizedBox(height: 8),
-                  ],
-                  if (_shouldShowDiskUsageMap(
-                    widget.store,
-                    widget.diskUsageMapRenderer,
-                  )) ...[
-                    _DiskUsageMapPanel(
-                      store: widget.store,
-                      activeTarget: widget.activeTarget,
-                      renderer: widget.diskUsageMapRenderer!,
-                      collapsed: widget.diskUsageMapCollapsed,
-                      compact: false,
-                      onToggle: widget.onToggleDiskUsageMap,
-                      onStoreChanged: widget.onStoreChanged,
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                  _NodeTable(
-                    store: widget.store,
-                    activeTarget: widget.activeTarget,
-                    onScan: widget.onScan,
-                    showEmptyScanAction: false,
-                    onRefreshFolderTarget: widget.onRefreshFolderTarget,
-                    onClearSearch: widget.onClearSearch,
-                    onStoreChanged: widget.onStoreChanged,
-                    collapsed: widget.nodeTableCollapsed,
-                    onToggleCollapsed: widget.onToggleNodeTable,
-                    rowsScrollable: false,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final showMetricStrip = _shouldShowMetricStrip(widget.store);
+              final showDiskUsageMap = _shouldShowDiskUsageMap(
+                widget.store,
+                widget.diskUsageMapRenderer,
+              );
+              final diskUsageMapHeight = _wideDiskUsageMapHeight(
+                viewportHeight: constraints.maxHeight,
+                metricStripVisible: showMetricStrip,
+                nodeTableCollapsed: widget.nodeTableCollapsed,
+              );
+
+              return Scrollbar(
+                controller: _scrollController,
+                notificationPredicate: (notification) =>
+                    notification.depth == 0,
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
+                  child: Column(
+                    children: [
+                      if (showMetricStrip) ...[
+                        _MetricStrip(store: widget.store),
+                        const SizedBox(height: 8),
+                      ],
+                      if (showDiskUsageMap) ...[
+                        _DiskUsageMapPanel(
+                          store: widget.store,
+                          activeTarget: widget.activeTarget,
+                          renderer: widget.diskUsageMapRenderer!,
+                          collapsed: widget.diskUsageMapCollapsed,
+                          compact: false,
+                          height: diskUsageMapHeight,
+                          onToggle: widget.onToggleDiskUsageMap,
+                          onStoreChanged: widget.onStoreChanged,
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      _NodeTable(
+                        store: widget.store,
+                        activeTarget: widget.activeTarget,
+                        onScan: widget.onScan,
+                        showEmptyScanAction: false,
+                        onRefreshFolderTarget: widget.onRefreshFolderTarget,
+                        onClearSearch: widget.onClearSearch,
+                        onStoreChanged: widget.onStoreChanged,
+                        collapsed: widget.nodeTableCollapsed,
+                        onToggleCollapsed: widget.onToggleNodeTable,
+                        rowsScrollable: false,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           ),
         ),
         if (showDetailsPane) ...[
@@ -1455,6 +1469,33 @@ class _WideWorkspaceState extends State<_WideWorkspace> {
       ],
     );
   }
+}
+
+double _wideDiskUsageMapHeight({
+  required double viewportHeight,
+  required bool metricStripVisible,
+  required bool nodeTableCollapsed,
+}) {
+  const defaultHeight = 260.0;
+  if (!nodeTableCollapsed || !viewportHeight.isFinite) {
+    return defaultHeight;
+  }
+
+  const viewportVerticalPadding = 22.0;
+  const sectionGap = 8.0;
+  const metricStripHeight = 64.0;
+  const diskUsageMapChromeHeight = 76.0;
+  const collapsedNodeTableHeight = 92.0;
+  final reservedHeight =
+      viewportVerticalPadding +
+      sectionGap +
+      diskUsageMapChromeHeight +
+      collapsedNodeTableHeight +
+      (metricStripVisible ? metricStripHeight + sectionGap : 0);
+
+  return (viewportHeight - reservedHeight)
+      .clamp(defaultHeight, double.infinity)
+      .toDouble();
 }
 
 class _CompactWorkspace extends StatelessWidget {
@@ -1568,6 +1609,7 @@ class _DiskUsageMapPanel extends StatelessWidget {
     required this.renderer,
     required this.collapsed,
     required this.compact,
+    this.height,
     required this.onToggle,
     required this.onStoreChanged,
   });
@@ -1577,6 +1619,7 @@ class _DiskUsageMapPanel extends StatelessWidget {
   final DiskUsageMapRenderer renderer;
   final bool collapsed;
   final bool compact;
+  final double? height;
   final VoidCallback onToggle;
   final VoidCallback onStoreChanged;
 
@@ -1686,7 +1729,7 @@ class _DiskUsageMapPanel extends StatelessWidget {
                     padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
                     child: SizedBox(
                       width: double.infinity,
-                      height: compact ? 220 : 260,
+                      height: height ?? (compact ? 220 : 260),
                       child: DiskUsageMapView(
                         projection: projection,
                         renderer: renderer,

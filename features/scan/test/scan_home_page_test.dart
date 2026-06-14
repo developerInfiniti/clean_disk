@@ -544,12 +544,20 @@ void main() {
   });
 
   testWidgets('wide folder tree table collapses and expands', (tester) async {
-    await _pumpScanHome(tester, size: const Size(1440, 900));
+    await _pumpScanHome(
+      tester,
+      size: const Size(1440, 900),
+      diskUsageMapRenderer: const _TestDiskUsageMapRenderer(),
+    );
 
     await _tapScanAction(tester);
     await tester.pumpAndSettle();
 
     final firstTreeRow = find.byKey(const ValueKey('app-tree-table-row-2'));
+    final renderedMap = find.byKey(
+      const ValueKey('test-disk-usage-map-renderer'),
+    );
+    final initialMapHeight = tester.getSize(renderedMap).height;
     expect(find.text('Contents'), findsOneWidget);
     expect(firstTreeRow, findsOneWidget);
 
@@ -559,6 +567,7 @@ void main() {
     expect(find.text('Contents'), findsOneWidget);
     expect(find.text('Name'), findsNothing);
     expect(firstTreeRow, findsNothing);
+    expect(tester.getSize(renderedMap).height, greaterThan(initialMapHeight));
 
     await tester.tap(find.byTooltip('Expand contents list'));
     await tester.pumpAndSettle();
