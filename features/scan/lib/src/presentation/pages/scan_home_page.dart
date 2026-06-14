@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:clean_disk_design_system/clean_disk_design_system.dart';
 import 'package:clean_disk_localization/clean_disk_localization.dart';
@@ -1796,7 +1797,7 @@ class _DiskUsageMapPanel extends StatelessWidget {
   }
 }
 
-class _DiskUsageMapBreadcrumbTrail extends StatelessWidget {
+class _DiskUsageMapBreadcrumbTrail extends StatefulWidget {
   const _DiskUsageMapBreadcrumbTrail({
     required this.items,
     required this.backTooltip,
@@ -1812,6 +1813,53 @@ class _DiskUsageMapBreadcrumbTrail extends StatelessWidget {
   final ValueChanged<NodeId?> onSelect;
 
   @override
+  State<_DiskUsageMapBreadcrumbTrail> createState() =>
+      _DiskUsageMapBreadcrumbTrailState();
+}
+
+class _DiskUsageMapBreadcrumbTrailState
+    extends State<_DiskUsageMapBreadcrumbTrail> {
+  final _scrollController = ScrollController();
+  String? _lastPathSignature;
+
+  @override
+  void initState() {
+    super.initState();
+    _lastPathSignature = _pathSignature(widget.items);
+    _scrollToCurrentPathEnd();
+  }
+
+  @override
+  void didUpdateWidget(covariant _DiskUsageMapBreadcrumbTrail oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final signature = _pathSignature(widget.items);
+    if (signature == _lastPathSignature) {
+      return;
+    }
+    _lastPathSignature = signature;
+    _scrollToCurrentPathEnd();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollToCurrentPathEnd() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) {
+        return;
+      }
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       key: const ValueKey('scan-disk-usage-map-breadcrumb-trail'),
@@ -1820,8 +1868,8 @@ class _DiskUsageMapBreadcrumbTrail extends StatelessWidget {
         children: [
           IconButton(
             key: const ValueKey('scan-disk-usage-map-back-action'),
-            tooltip: backTooltip,
-            onPressed: canGoBack ? onBack : null,
+            tooltip: widget.backTooltip,
+            onPressed: widget.canGoBack ? widget.onBack : null,
             color: _ScanColors.textSoft,
             disabledColor: _ScanColors.textSoft.withAlpha(90),
             iconSize: 18,
@@ -1832,34 +1880,70 @@ class _DiskUsageMapBreadcrumbTrail extends StatelessWidget {
           ),
           const SizedBox(width: 2),
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  for (var index = 0; index < items.length; index += 1) ...[
-                    if (index > 0)
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 2),
-                        child: Icon(
-                          Icons.chevron_right_rounded,
-                          color: _ScanColors.textSoft,
-                          size: 16,
+            child: ScrollConfiguration(
+              behavior: ScrollConfiguration.of(context).copyWith(
+                dragDevices: {
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.trackpad,
+                  PointerDeviceKind.stylus,
+                  PointerDeviceKind.invertedStylus,
+                },
+              ),
+              child: Scrollbar(
+                controller: _scrollController,
+                thumbVisibility: true,
+                trackVisibility: false,
+                interactive: true,
+                thickness: 3,
+                radius: const Radius.circular(999),
+                notificationPredicate: (notification) =>
+                    notification.metrics.axis == Axis.horizontal,
+                child: SingleChildScrollView(
+                  key: const ValueKey('scan-disk-usage-map-breadcrumb-scroll'),
+                  controller: _scrollController,
+                  scrollDirection: Axis.horizontal,
+                  physics: const ClampingScrollPhysics(),
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(
+                    children: [
+                      for (
+                        var index = 0;
+                        index < widget.items.length;
+                        index += 1
+                      ) ...[
+                        if (index > 0)
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 2),
+                            child: Icon(
+                              Icons.chevron_right_rounded,
+                              color: _ScanColors.textSoft,
+                              size: 16,
+                            ),
+                          ),
+                        _DiskUsageMapBreadcrumbButton(
+                          item: widget.items[index],
+                          onTap: widget.items[index].selected
+                              ? null
+                              : () =>
+                                    widget.onSelect(widget.items[index].nodeId),
                         ),
-                      ),
-                    _DiskUsageMapBreadcrumbButton(
-                      item: items[index],
-                      onTap: items[index].selected
-                          ? null
-                          : () => onSelect(items[index].nodeId),
-                    ),
-                  ],
-                ],
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ],
       ),
     );
+  }
+
+  static String _pathSignature(List<_DiskUsageMapBreadcrumbItem> items) {
+    return items
+        .map((item) => '${item.nodeId?.value ?? 'root'}:${item.label}')
+        .join('/');
   }
 }
 

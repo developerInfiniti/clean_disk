@@ -219,6 +219,46 @@ void main() {
     expect(renderedMap, findsOneWidget);
   });
 
+  testWidgets('disk map breadcrumb scrolls when the path is long', (
+    tester,
+  ) async {
+    await _pumpScanHome(
+      tester,
+      size: const Size(1120, 900),
+      diskUsageMapRenderer: const _TestDiskUsageMapRenderer(),
+    );
+
+    await _tapScanAction(tester);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const ValueKey('test-map-tile-Library')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('test-map-tile-Caches')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('test-map-tile-Browser Cache')));
+    await tester.pumpAndSettle();
+
+    final breadcrumbScroll = find.byKey(
+      const ValueKey('scan-disk-usage-map-breadcrumb-scroll'),
+    );
+    final scrollView = tester.widget<SingleChildScrollView>(breadcrumbScroll);
+    final controller = scrollView.controller!;
+    expect(controller.position.maxScrollExtent, greaterThan(0));
+
+    controller.jumpTo(0);
+    await tester.pump();
+
+    await tester.drag(
+      breadcrumbScroll,
+      const Offset(-120, 0),
+      kind: PointerDeviceKind.mouse,
+      buttons: kPrimaryMouseButton,
+    );
+    await tester.pumpAndSettle();
+
+    expect(controller.offset, greaterThan(0));
+  });
+
   testWidgets('compact layout fits narrow desktop width', (tester) async {
     await _pumpScanHome(tester, size: const Size(430, 900));
 
