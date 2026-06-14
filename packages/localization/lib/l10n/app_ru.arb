@@ -101,6 +101,7 @@
   "diskUsageMapOtherLabel": "Остальное",
   "diskUsageMapExpandAction": "Развернуть карту диска",
   "diskUsageMapCollapseAction": "Свернуть карту диска",
+  "diskUsageMapBackAction": "Назад по карте диска",
   "revealAction": "Показать",
   "revealBusyAction": "Открываю...",
   "revealUnavailableDisplayPath": "Открытие недоступно для укороченного пути. Раскрой папки в дереве, чтобы выбрать точный файл или папку.",

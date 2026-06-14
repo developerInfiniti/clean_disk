@@ -287,6 +287,9 @@ class CleanDiskLocalizationsEn extends CleanDiskLocalizations {
   String get diskUsageMapCollapseAction => 'Collapse disk map';
 
   @override
+  String get diskUsageMapBackAction => 'Back in disk map';
+
+  @override
   String get revealAction => 'Reveal';
 
   @override

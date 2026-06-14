@@ -1484,7 +1484,7 @@ double _wideDiskUsageMapHeight({
   const viewportVerticalPadding = 22.0;
   const sectionGap = 8.0;
   const metricStripHeight = 64.0;
-  const diskUsageMapChromeHeight = 76.0;
+  const diskUsageMapChromeHeight = 114.0;
   const collapsedNodeTableHeight = 92.0;
   final reservedHeight =
       viewportVerticalPadding +
@@ -1638,6 +1638,13 @@ class _DiskUsageMapPanel extends StatelessWidget {
     final toggleLabel = collapsed
         ? l10n.diskUsageMapExpandAction
         : l10n.diskUsageMapCollapseAction;
+    final breadcrumbItems = _diskUsageMapBreadcrumbItems(
+      store: store,
+      activeTarget: activeTarget,
+    );
+    final parentBreadcrumbNodeId = _diskUsageMapParentBreadcrumbNodeId(
+      breadcrumbItems,
+    );
 
     return Container(
       key: const ValueKey('scan-disk-usage-map-panel'),
@@ -1725,30 +1732,54 @@ class _DiskUsageMapPanel extends StatelessWidget {
             curve: Curves.easeOutCubic,
             child: collapsed
                 ? const SizedBox.shrink()
-                : Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: height ?? (compact ? 220 : 260),
-                      child: DiskUsageMapView(
-                        projection: projection,
-                        renderer: renderer,
-                        labels: _diskUsageMapLabels(l10n),
-                        style: _diskUsageMapStyle,
-                        selectedNodeId: store.selectedNodeId?.value,
-                        focusedNodeId: store.diskUsageMapFocusNodeId?.value,
-                        onTileSelected: (tile) =>
-                            _selectDiskUsageMapTile(tile, store),
-                        onTileActivated: (tile) =>
-                            _selectDiskUsageMapTile(tile, store),
-                        dataFallbackMaxItems: compact ? 8 : 12,
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _DiskUsageMapBreadcrumbTrail(
+                        items: breadcrumbItems,
+                        backTooltip: l10n.diskUsageMapBackAction,
+                        canGoBack: parentBreadcrumbNodeId != null,
+                        onBack: () => _selectDiskUsageMapBreadcrumb(
+                          parentBreadcrumbNodeId,
+                          store,
+                        ),
+                        onSelect: (nodeId) =>
+                            _selectDiskUsageMapBreadcrumb(nodeId, store),
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: height ?? (compact ? 220 : 260),
+                          child: DiskUsageMapView(
+                            projection: projection,
+                            renderer: renderer,
+                            labels: _diskUsageMapLabels(l10n),
+                            style: _diskUsageMapStyle,
+                            selectedNodeId: store.selectedNodeId?.value,
+                            focusedNodeId: store.diskUsageMapFocusNodeId?.value,
+                            onTileSelected: (tile) =>
+                                _selectDiskUsageMapTile(tile, store),
+                            onTileActivated: (tile) =>
+                                _selectDiskUsageMapTile(tile, store),
+                            dataFallbackMaxItems: compact ? 8 : 12,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
           ),
         ],
       ),
     );
+  }
+
+  void _selectDiskUsageMapBreadcrumb(NodeId? nodeId, ScanWorkspaceStore store) {
+    store.setDiskUsageMapFocus(nodeId);
+    if (nodeId == null) {
+      return;
+    }
+    unawaited(store.selectNode(nodeId).whenComplete(onStoreChanged));
   }
 
   void _selectDiskUsageMapTile(
@@ -1762,6 +1793,114 @@ class _DiskUsageMapPanel extends StatelessWidget {
     final nodeId = NodeId(tile.nodeId);
     store.toggleDiskUsageMapFocus(nodeId);
     unawaited(store.selectNode(nodeId).whenComplete(onStoreChanged));
+  }
+}
+
+class _DiskUsageMapBreadcrumbTrail extends StatelessWidget {
+  const _DiskUsageMapBreadcrumbTrail({
+    required this.items,
+    required this.backTooltip,
+    required this.canGoBack,
+    required this.onBack,
+    required this.onSelect,
+  });
+
+  final List<_DiskUsageMapBreadcrumbItem> items;
+  final String backTooltip;
+  final bool canGoBack;
+  final VoidCallback onBack;
+  final ValueChanged<NodeId?> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      key: const ValueKey('scan-disk-usage-map-breadcrumb-trail'),
+      padding: const EdgeInsets.fromLTRB(10, 0, 8, 8),
+      child: Row(
+        children: [
+          IconButton(
+            key: const ValueKey('scan-disk-usage-map-back-action'),
+            tooltip: backTooltip,
+            onPressed: canGoBack ? onBack : null,
+            color: _ScanColors.textSoft,
+            disabledColor: _ScanColors.textSoft.withAlpha(90),
+            iconSize: 18,
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+            icon: const Icon(Icons.arrow_back_rounded),
+          ),
+          const SizedBox(width: 2),
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (var index = 0; index < items.length; index += 1) ...[
+                    if (index > 0)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 2),
+                        child: Icon(
+                          Icons.chevron_right_rounded,
+                          color: _ScanColors.textSoft,
+                          size: 16,
+                        ),
+                      ),
+                    _DiskUsageMapBreadcrumbButton(
+                      item: items[index],
+                      onTap: items[index].selected
+                          ? null
+                          : () => onSelect(items[index].nodeId),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DiskUsageMapBreadcrumbButton extends StatelessWidget {
+  const _DiskUsageMapBreadcrumbButton({
+    required this.item,
+    required this.onTap,
+  });
+
+  final _DiskUsageMapBreadcrumbItem item;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = item.selected ? _ScanColors.cyan : _ScanColors.textSoft;
+    return Tooltip(
+      message: item.label,
+      waitDuration: const Duration(milliseconds: 450),
+      child: InkWell(
+        key: ValueKey(
+          'scan-disk-usage-map-breadcrumb-${item.nodeId?.value ?? 'root'}',
+        ),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 220),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+            child: Text(
+              item.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: _bodyStyle(context).copyWith(
+                color: color,
+                fontWeight: item.selected ? FontWeight.w800 : FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -6346,6 +6485,88 @@ String _diskUsageMapSummaryText(
   return '${focusedNode.name} - $sizeText - $itemText';
 }
 
+final class _DiskUsageMapBreadcrumbItem {
+  const _DiskUsageMapBreadcrumbItem({
+    required this.label,
+    required this.nodeId,
+    required this.selected,
+  });
+
+  final String label;
+  final NodeId? nodeId;
+  final bool selected;
+}
+
+List<_DiskUsageMapBreadcrumbItem> _diskUsageMapBreadcrumbItems({
+  required ScanWorkspaceStore store,
+  required ScanTarget activeTarget,
+}) {
+  final focusedNode = store.diskUsageMapFocusNode;
+  final rootLabel = _targetDisplayName(activeTarget);
+  if (focusedNode == null) {
+    return [
+      _DiskUsageMapBreadcrumbItem(
+        label: rootLabel,
+        nodeId: null,
+        selected: true,
+      ),
+    ];
+  }
+
+  final rowsById = <NodeId, NodePageItem>{};
+  final rootNode = store.diskUsageMapRootNode;
+  if (rootNode != null) {
+    rowsById[rootNode.nodeId] = rootNode;
+  }
+  for (final row in store.diskUsageMapAllRows) {
+    rowsById[row.nodeId] = row;
+  }
+  for (final row in store.visibleRows) {
+    rowsById[row.nodeId] = row;
+  }
+  final focusedPath = <NodePageItem>[];
+  var current = focusedNode;
+  final visited = <NodeId>{};
+  while (visited.add(current.nodeId)) {
+    focusedPath.add(current);
+    final parentId = current.parentId;
+    if (parentId == null ||
+        parentId == store.viewport.parentId ||
+        parentId == store.primaryRootNodeId ||
+        parentId == store.diskUsageMapRootNode?.nodeId) {
+      break;
+    }
+    final parent = rowsById[parentId];
+    if (parent == null) {
+      break;
+    }
+    current = parent;
+  }
+
+  return [
+    _DiskUsageMapBreadcrumbItem(
+      label: rootLabel,
+      nodeId: null,
+      selected: false,
+    ),
+    for (final row in focusedPath.reversed)
+      _DiskUsageMapBreadcrumbItem(
+        label: row.name,
+        nodeId: row.nodeId,
+        selected: row.nodeId == focusedNode.nodeId,
+      ),
+  ];
+}
+
+NodeId? _diskUsageMapParentBreadcrumbNodeId(
+  List<_DiskUsageMapBreadcrumbItem> items,
+) {
+  if (items.length <= 1) {
+    return null;
+  }
+  return items[items.length - 2].nodeId;
+}
+
 DiskUsageMapProjection? _diskUsageMapProjection({
   required CleanDiskLocalizations l10n,
   required ScanWorkspaceStore store,
@@ -6711,7 +6932,7 @@ List<String> _knownTreePathParts(ScanWorkspaceStore store, NodeId nodeId) {
   for (final row in store.visibleRows) {
     rowsById.putIfAbsent(row.nodeId, () => row);
   }
-  for (final row in store.diskUsageMapRows) {
+  for (final row in store.diskUsageMapAllRows) {
     rowsById.putIfAbsent(row.nodeId, () => row);
   }
 

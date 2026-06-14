@@ -623,6 +623,12 @@ abstract class CleanDiskLocalizations {
   /// **'Collapse disk map'**
   String get diskUsageMapCollapseAction;
 
+  /// Tooltip for moving the disk usage map focus to the parent path.
+  ///
+  /// In en, this message translates to:
+  /// **'Back in disk map'**
+  String get diskUsageMapBackAction;
+
   /// Localized string for revealAction.
   ///
   /// In en, this message translates to:

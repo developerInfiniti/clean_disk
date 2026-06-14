@@ -166,6 +166,32 @@ void main() {
     expect(mapLabels, contains('Caches'));
     expect(mapLabels, contains('Xcode'));
     expect(mapLabels, isNot(contains('Downloads')));
+    expect(
+      find.byKey(const ValueKey('scan-disk-usage-map-breadcrumb-trail')),
+      findsOneWidget,
+    );
+    expect(
+      tester
+          .widget<IconButton>(
+            find.byKey(const ValueKey('scan-disk-usage-map-back-action')),
+          )
+          .onPressed,
+      isNotNull,
+    );
+
+    await tester.tap(
+      find.byKey(const ValueKey('scan-disk-usage-map-back-action')),
+    );
+    await tester.pumpAndSettle();
+
+    mapLabels = _diskUsageMapLabels(tester);
+    expect(mapLabels, contains('Downloads'));
+
+    await tester.tap(find.byKey(const ValueKey('test-map-tile-Library')));
+    await tester.pumpAndSettle();
+
+    mapLabels = _diskUsageMapLabels(tester);
+    expect(mapLabels, isNot(contains('Downloads')));
 
     await tester.tap(find.byKey(const ValueKey('test-map-tile-Library')));
     await tester.pumpAndSettle();

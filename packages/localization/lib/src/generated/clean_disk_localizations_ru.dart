@@ -288,6 +288,9 @@ class CleanDiskLocalizationsRu extends CleanDiskLocalizations {
   String get diskUsageMapCollapseAction => 'Свернуть карту диска';
 
   @override
+  String get diskUsageMapBackAction => 'Назад по карте диска';
+
+  @override
   String get revealAction => 'Показать';
 
   @override

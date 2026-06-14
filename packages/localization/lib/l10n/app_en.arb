@@ -360,6 +360,10 @@
   "@diskUsageMapCollapseAction": {
     "description": "Tooltip for collapsing the disk usage map panel."
   },
+  "diskUsageMapBackAction": "Back in disk map",
+  "@diskUsageMapBackAction": {
+    "description": "Tooltip for moving the disk usage map focus to the parent path."
+  },
   "revealAction": "Reveal",
   "@revealAction": {
     "description": "Localized string for revealAction."
