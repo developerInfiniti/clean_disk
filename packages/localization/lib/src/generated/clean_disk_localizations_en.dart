@@ -201,6 +201,15 @@ class CleanDiskLocalizationsEn extends CleanDiskLocalizations {
   String get itemsColumn => 'Items';
 
   @override
+  String get nodeTableTitle => 'Contents';
+
+  @override
+  String get nodeTableExpandAction => 'Expand contents list';
+
+  @override
+  String get nodeTableCollapseAction => 'Collapse contents list';
+
+  @override
   String get detailsTitle => 'Details';
 
   @override

@@ -180,6 +180,69 @@ void main() {
     expect(find.text('Empty'), findsOneWidget);
   });
 
+  testWidgets('can collapse panel content behind a compact header', (
+    tester,
+  ) async {
+    var collapsed = true;
+    late StateSetter setState;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.dark(),
+        home: Scaffold(
+          body: SizedBox(
+            width: 720,
+            child: StatefulBuilder(
+              builder: (context, updateState) {
+                setState = updateState;
+                return AppTreeTable(
+                  title: 'Contents',
+                  subtitle: 'C: - 1 item',
+                  collapsed: collapsed,
+                  expandTooltip: 'Expand contents list',
+                  collapseTooltip: 'Collapse contents list',
+                  onToggleCollapsed: () {
+                    setState(() {
+                      collapsed = !collapsed;
+                    });
+                  },
+                  columns: columns,
+                  rows: const [
+                    AppTreeTableRow(
+                      id: '1',
+                      name: 'System',
+                      sizeText: '462.8 GB',
+                      percentText: '100%',
+                      itemsText: '8',
+                      progress: 1,
+                      depth: 0,
+                      selected: false,
+                      hasChildren: true,
+                      expanded: false,
+                      icon: Icons.folder_outlined,
+                    ),
+                  ],
+                  emptyState: Text('Empty'),
+                  style: style,
+                  rowsScrollable: false,
+                );
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Contents'), findsOneWidget);
+    expect(find.text('System'), findsNothing);
+
+    await tester.tap(find.byTooltip('Expand contents list'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('System'), findsOneWidget);
+    expect(find.byTooltip('Collapse contents list'), findsOneWidget);
+  });
+
   testWidgets('can size rows to content for page-level scrolling', (
     tester,
   ) async {

@@ -543,6 +543,30 @@ void main() {
     expect(find.byKey(const ValueKey('scan-footer-hidden')), findsOneWidget);
   });
 
+  testWidgets('wide folder tree table collapses and expands', (tester) async {
+    await _pumpScanHome(tester, size: const Size(1440, 900));
+
+    await _tapScanAction(tester);
+    await tester.pumpAndSettle();
+
+    final firstTreeRow = find.byKey(const ValueKey('app-tree-table-row-2'));
+    expect(find.text('Contents'), findsOneWidget);
+    expect(firstTreeRow, findsOneWidget);
+
+    await tester.tap(find.byTooltip('Collapse contents list'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Contents'), findsOneWidget);
+    expect(find.text('Name'), findsNothing);
+    expect(firstTreeRow, findsNothing);
+
+    await tester.tap(find.byTooltip('Expand contents list'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Name'), findsOneWidget);
+    expect(firstTreeRow, findsOneWidget);
+  });
+
   testWidgets('wide empty state stays compact and above visual center', (
     tester,
   ) async {

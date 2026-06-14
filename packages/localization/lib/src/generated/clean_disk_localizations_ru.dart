@@ -200,6 +200,15 @@ class CleanDiskLocalizationsRu extends CleanDiskLocalizations {
   String get itemsColumn => 'Кол.';
 
   @override
+  String get nodeTableTitle => 'Содержимое';
+
+  @override
+  String get nodeTableExpandAction => 'Развернуть список';
+
+  @override
+  String get nodeTableCollapseAction => 'Свернуть список';
+
+  @override
   String get detailsTitle => 'Детали';
 
   @override

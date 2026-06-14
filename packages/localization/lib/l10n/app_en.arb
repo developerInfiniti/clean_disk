@@ -252,6 +252,18 @@
   "@itemsColumn": {
     "description": "Localized string for itemsColumn."
   },
+  "nodeTableTitle": "Contents",
+  "@nodeTableTitle": {
+    "description": "Title for the collapsible scan results tree table."
+  },
+  "nodeTableExpandAction": "Expand contents list",
+  "@nodeTableExpandAction": {
+    "description": "Tooltip for expanding the scan results tree table."
+  },
+  "nodeTableCollapseAction": "Collapse contents list",
+  "@nodeTableCollapseAction": {
+    "description": "Tooltip for collapsing the scan results tree table."
+  },
   "detailsTitle": "Details",
   "@detailsTitle": {
     "description": "Localized string for detailsTitle."

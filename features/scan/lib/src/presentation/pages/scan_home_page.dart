@@ -45,6 +45,7 @@ class _ScanHomePageState extends State<ScanHomePage> {
   var _aiPaneCollapsed = false;
   var _detailsPaneCollapsed = false;
   var _diskUsageMapCollapsed = false;
+  var _nodeTableCollapsed = false;
   var _uiRefreshScheduled = false;
   var _scanFeedbackActive = false;
   var _searchSequence = 0;
@@ -111,12 +112,14 @@ class _ScanHomePageState extends State<ScanHomePage> {
           detailsPaneCollapsed: _detailsPaneCollapsed,
           diskUsageMapRenderer: widget.diskUsageMapRenderer,
           diskUsageMapCollapsed: _diskUsageMapCollapsed,
+          nodeTableCollapsed: _nodeTableCollapsed,
           onScan: _canRunScan ? () => _startScan(widget.store) : null,
           onPause: () => _cancelScan(widget.store),
           onPickTarget: () => unawaited(_pickScanTarget(widget.store)),
           onToggleDetailsPane: _toggleDetailsPane,
           onToggleAiPane: _toggleAiPane,
           onToggleDiskUsageMap: _toggleDiskUsageMap,
+          onToggleNodeTable: _toggleNodeTable,
           onChooseTarget: (choice) =>
               unawaited(_selectScanTarget(widget.store, choice.target)),
           onChooseFolderTarget: () =>
@@ -152,6 +155,12 @@ class _ScanHomePageState extends State<ScanHomePage> {
   void _toggleDiskUsageMap() {
     setState(() {
       _diskUsageMapCollapsed = !_diskUsageMapCollapsed;
+    });
+  }
+
+  void _toggleNodeTable() {
+    setState(() {
+      _nodeTableCollapsed = !_nodeTableCollapsed;
     });
   }
 
@@ -845,6 +854,7 @@ class ScanWorkspaceView extends StatelessWidget {
     required this.aiPaneCollapsed,
     required this.detailsPaneCollapsed,
     required this.diskUsageMapCollapsed,
+    required this.nodeTableCollapsed,
     this.diskUsageMapRenderer,
     required this.onScan,
     required this.onPause,
@@ -852,6 +862,7 @@ class ScanWorkspaceView extends StatelessWidget {
     required this.onToggleAiPane,
     required this.onToggleDetailsPane,
     required this.onToggleDiskUsageMap,
+    required this.onToggleNodeTable,
     required this.onChooseTarget,
     required this.onChooseFolderTarget,
     required this.onPermissionProbe,
@@ -877,6 +888,7 @@ class ScanWorkspaceView extends StatelessWidget {
   final bool aiPaneCollapsed;
   final bool detailsPaneCollapsed;
   final bool diskUsageMapCollapsed;
+  final bool nodeTableCollapsed;
   final DiskUsageMapRenderer? diskUsageMapRenderer;
   final VoidCallback? onScan;
   final VoidCallback onPause;
@@ -884,6 +896,7 @@ class ScanWorkspaceView extends StatelessWidget {
   final VoidCallback onToggleAiPane;
   final VoidCallback onToggleDetailsPane;
   final VoidCallback onToggleDiskUsageMap;
+  final VoidCallback onToggleNodeTable;
   final ValueChanged<ScanTargetChoice> onChooseTarget;
   final VoidCallback onChooseFolderTarget;
   final VoidCallback onPermissionProbe;
@@ -961,6 +974,8 @@ class ScanWorkspaceView extends StatelessWidget {
                               diskUsageMapRenderer: diskUsageMapRenderer,
                               diskUsageMapCollapsed: diskUsageMapCollapsed,
                               onToggleDiskUsageMap: onToggleDiskUsageMap,
+                              nodeTableCollapsed: nodeTableCollapsed,
+                              onToggleNodeTable: onToggleNodeTable,
                             )
                           : _WideWorkspace(
                               store: store,
@@ -974,6 +989,8 @@ class ScanWorkspaceView extends StatelessWidget {
                               diskUsageMapRenderer: diskUsageMapRenderer,
                               diskUsageMapCollapsed: diskUsageMapCollapsed,
                               onToggleDiskUsageMap: onToggleDiskUsageMap,
+                              nodeTableCollapsed: nodeTableCollapsed,
+                              onToggleNodeTable: onToggleNodeTable,
                               aiPaneCollapsed: aiPaneCollapsed,
                               onToggleAiPane: onToggleAiPane,
                               detailsPaneCollapsed: detailsPaneCollapsed,
@@ -1289,6 +1306,8 @@ class _WideWorkspace extends StatefulWidget {
     required this.diskUsageMapRenderer,
     required this.diskUsageMapCollapsed,
     required this.onToggleDiskUsageMap,
+    required this.nodeTableCollapsed,
+    required this.onToggleNodeTable,
     required this.aiPaneCollapsed,
     required this.onToggleAiPane,
     required this.detailsPaneCollapsed,
@@ -1311,6 +1330,8 @@ class _WideWorkspace extends StatefulWidget {
   final DiskUsageMapRenderer? diskUsageMapRenderer;
   final bool diskUsageMapCollapsed;
   final VoidCallback onToggleDiskUsageMap;
+  final bool nodeTableCollapsed;
+  final VoidCallback onToggleNodeTable;
   final bool aiPaneCollapsed;
   final VoidCallback onToggleAiPane;
   final bool detailsPaneCollapsed;
@@ -1395,6 +1416,8 @@ class _WideWorkspaceState extends State<_WideWorkspace> {
                     onRefreshFolderTarget: widget.onRefreshFolderTarget,
                     onClearSearch: widget.onClearSearch,
                     onStoreChanged: widget.onStoreChanged,
+                    collapsed: widget.nodeTableCollapsed,
+                    onToggleCollapsed: widget.onToggleNodeTable,
                     rowsScrollable: false,
                   ),
                 ],
@@ -1451,6 +1474,8 @@ class _CompactWorkspace extends StatelessWidget {
     required this.diskUsageMapRenderer,
     required this.diskUsageMapCollapsed,
     required this.onToggleDiskUsageMap,
+    required this.nodeTableCollapsed,
+    required this.onToggleNodeTable,
   });
 
   final ScanWorkspaceStore store;
@@ -1468,6 +1493,8 @@ class _CompactWorkspace extends StatelessWidget {
   final DiskUsageMapRenderer? diskUsageMapRenderer;
   final bool diskUsageMapCollapsed;
   final VoidCallback onToggleDiskUsageMap;
+  final bool nodeTableCollapsed;
+  final VoidCallback onToggleNodeTable;
 
   @override
   Widget build(BuildContext context) {
@@ -1514,6 +1541,8 @@ class _CompactWorkspace extends StatelessWidget {
             onRefreshFolderTarget: onRefreshFolderTarget,
             onClearSearch: onClearSearch,
             onStoreChanged: onStoreChanged,
+            collapsed: nodeTableCollapsed,
+            onToggleCollapsed: onToggleNodeTable,
             rowsScrollable: false,
           ),
           if (showDetailsPane) ...[
@@ -2450,6 +2479,8 @@ class _NodeTable extends StatelessWidget {
     required this.onRefreshFolderTarget,
     required this.onClearSearch,
     required this.onStoreChanged,
+    required this.collapsed,
+    required this.onToggleCollapsed,
     this.rowsScrollable = true,
   });
 
@@ -2460,6 +2491,8 @@ class _NodeTable extends StatelessWidget {
   final ValueChanged<ScanTarget> onRefreshFolderTarget;
   final VoidCallback onClearSearch;
   final VoidCallback onStoreChanged;
+  final bool collapsed;
+  final VoidCallback onToggleCollapsed;
   final bool rowsScrollable;
 
   @override
@@ -2497,6 +2530,7 @@ class _NodeTable extends StatelessWidget {
         ? null
         : _tableState(l10n: l10n, store: store, issueCount: _issueCount(rows));
     final queryBanner = _queryModeBanner(l10n, store);
+    final showTableHeader = tableRows.isNotEmpty || queryBanner != null;
 
     return Column(
       children: [
@@ -2518,6 +2552,7 @@ class _NodeTable extends StatelessWidget {
               showPartialRows || store.viewport.mode == ScanQueryMode.children,
           allowContextMenu: !showPartialRows,
           queryBanner: queryBanner,
+          showTableHeader: showTableHeader,
         ),
         if (!showPartialRows && store.canLoadMoreVisibleTreeRows) ...[
           const SizedBox(height: 8),
@@ -2541,8 +2576,17 @@ class _NodeTable extends StatelessWidget {
     required bool allowExpansion,
     required bool allowContextMenu,
     required _RowsStateContent? queryBanner,
+    required bool showTableHeader,
   }) {
     final table = AppTreeTable(
+      title: showTableHeader ? l10n.nodeTableTitle : null,
+      subtitle: showTableHeader
+          ? '${_targetDisplayName(activeTarget)} - ${l10n.detailsItemsCount(count: tableRows.length)}'
+          : null,
+      collapsed: showTableHeader && collapsed,
+      expandTooltip: l10n.nodeTableExpandAction,
+      collapseTooltip: l10n.nodeTableCollapseAction,
+      onToggleCollapsed: showTableHeader ? onToggleCollapsed : null,
       columns: AppTreeTableColumnLabels(
         name: l10n.nameColumn,
         size: l10n.sizeColumn,

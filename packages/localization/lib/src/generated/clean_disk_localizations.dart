@@ -461,6 +461,24 @@ abstract class CleanDiskLocalizations {
   /// **'Items'**
   String get itemsColumn;
 
+  /// Title for the collapsible scan results tree table.
+  ///
+  /// In en, this message translates to:
+  /// **'Contents'**
+  String get nodeTableTitle;
+
+  /// Tooltip for expanding the scan results tree table.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand contents list'**
+  String get nodeTableExpandAction;
+
+  /// Tooltip for collapsing the scan results tree table.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse contents list'**
+  String get nodeTableCollapseAction;
+
   /// Localized string for detailsTitle.
   ///
   /// In en, this message translates to:
