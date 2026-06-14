@@ -96,6 +96,9 @@ class CleanDiskLocalizationsEn extends CleanDiskLocalizations {
   String get targetPickAction => 'Choose folder';
 
   @override
+  String get targetOtherPathAction => 'Other path';
+
+  @override
   String get targetChangeAction => 'Change folder';
 
   @override
@@ -112,6 +115,9 @@ class CleanDiskLocalizationsEn extends CleanDiskLocalizations {
       'Pick a folder or disk before scanning so results are tied to an explicit target.';
 
   @override
+  String get scanScopeSection => 'Scan scope';
+
+  @override
   String get totalScannedLabel => 'Total Scanned';
 
   @override
@@ -122,6 +128,65 @@ class CleanDiskLocalizationsEn extends CleanDiskLocalizations {
 
   @override
   String get skippedLabel => 'Skipped';
+
+  @override
+  String get aiAssistantTitle => 'AI assistant';
+
+  @override
+  String get aiAssistantSubtitle => 'Cleanup history and suggestions';
+
+  @override
+  String get aiStatusScanning => 'Scanning and collecting candidates';
+
+  @override
+  String get aiStatusReady => 'Ready to suggest cleanup from results';
+
+  @override
+  String get aiStatusRunScanFirst =>
+      'Run a scan and I will find cleanup candidates';
+
+  @override
+  String get aiHistorySection => 'History';
+
+  @override
+  String get aiAskPlaceholder => 'Ask about cleanup...';
+
+  @override
+  String get aiAuthorAssistant => 'AI';
+
+  @override
+  String get aiAuthorUser => 'You';
+
+  @override
+  String get aiIntroMessage =>
+      'I will keep the decision history and explain why a file is safe to touch or better to leave.';
+
+  @override
+  String get aiUserStarterMessage =>
+      'What takes space and what is safe to clean?';
+
+  @override
+  String aiSnapshotAdvice({required String focusName}) {
+    return 'Start with \"$focusName\". Open large subfolders first, then add clear temporary files to the review list.';
+  }
+
+  @override
+  String get aiNoSnapshotAdvice =>
+      'After a scan I will show large folders, risk, and the safest next step.';
+
+  @override
+  String get aiSafeModeTitle => 'Safe mode';
+
+  @override
+  String get aiSafeModeText =>
+      'Do not delete folder roots immediately, only through the review list.';
+
+  @override
+  String get aiDialogMemoryTitle => 'Dialog memory';
+
+  @override
+  String get aiDialogMemoryText =>
+      'There is room here for a long conversation about the current disk.';
 
   @override
   String get nameColumn => 'Name';

@@ -96,6 +96,9 @@ class CleanDiskLocalizationsRu extends CleanDiskLocalizations {
   String get targetPickAction => 'Выбрать папку';
 
   @override
+  String get targetOtherPathAction => 'Другой путь';
+
+  @override
   String get targetChangeAction => 'Сменить папку';
 
   @override
@@ -112,6 +115,9 @@ class CleanDiskLocalizationsRu extends CleanDiskLocalizations {
       'Выбери папку или диск, чтобы результаты были привязаны к явной цели.';
 
   @override
+  String get scanScopeSection => 'Область сканирования';
+
+  @override
   String get totalScannedLabel => 'Просканировано';
 
   @override
@@ -122,6 +128,64 @@ class CleanDiskLocalizationsRu extends CleanDiskLocalizations {
 
   @override
   String get skippedLabel => 'Пропущено';
+
+  @override
+  String get aiAssistantTitle => 'AI-помощник';
+
+  @override
+  String get aiAssistantSubtitle => 'История очистки и подсказки';
+
+  @override
+  String get aiStatusScanning => 'Сканирую и собираю кандидатов';
+
+  @override
+  String get aiStatusReady => 'Готов подсказать по результатам';
+
+  @override
+  String get aiStatusRunScanFirst => 'Запусти скан, потом разберу мусор';
+
+  @override
+  String get aiHistorySection => 'История';
+
+  @override
+  String get aiAskPlaceholder => 'Спросить про очистку...';
+
+  @override
+  String get aiAuthorAssistant => 'AI';
+
+  @override
+  String get aiAuthorUser => 'Ты';
+
+  @override
+  String get aiIntroMessage =>
+      'Я буду держать историю решений и объяснять, почему файл можно трогать или лучше оставить.';
+
+  @override
+  String get aiUserStarterMessage =>
+      'Что занимает место и что безопасно чистить?';
+
+  @override
+  String aiSnapshotAdvice({required String focusName}) {
+    return 'Начни с \"$focusName\". Сначала открывай крупные подпапки, потом добавляй понятные временные файлы в список проверки.';
+  }
+
+  @override
+  String get aiNoSnapshotAdvice =>
+      'После скана покажу крупные папки, риск и безопасный следующий шаг.';
+
+  @override
+  String get aiSafeModeTitle => 'Безопасный режим';
+
+  @override
+  String get aiSafeModeText =>
+      'Не удалять корни папок сразу, только через список проверки.';
+
+  @override
+  String get aiDialogMemoryTitle => 'Память диалога';
+
+  @override
+  String get aiDialogMemoryText =>
+      'Здесь поместится длинная переписка по текущему диску.';
 
   @override
   String get nameColumn => 'Имя';

@@ -269,6 +269,12 @@ abstract class CleanDiskLocalizations {
   /// **'Choose folder'**
   String get targetPickAction;
 
+  /// Action that opens the full scan target picker for choosing a custom path.
+  ///
+  /// In en, this message translates to:
+  /// **'Other path'**
+  String get targetOtherPathAction;
+
   /// Tooltip for changing an already selected folder scan target.
   ///
   /// In en, this message translates to:
@@ -299,6 +305,12 @@ abstract class CleanDiskLocalizations {
   /// **'Pick a folder or disk before scanning so results are tied to an explicit target.'**
   String get firstRunTargetText;
 
+  /// Section caption for the scan target picker menu in the header.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan scope'**
+  String get scanScopeSection;
+
   /// Localized string for totalScannedLabel.
   ///
   /// In en, this message translates to:
@@ -322,6 +334,108 @@ abstract class CleanDiskLocalizations {
   /// In en, this message translates to:
   /// **'Skipped'**
   String get skippedLabel;
+
+  /// Title for the AI assistant side rail.
+  ///
+  /// In en, this message translates to:
+  /// **'AI assistant'**
+  String get aiAssistantTitle;
+
+  /// Subtitle for the AI assistant side rail.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup history and suggestions'**
+  String get aiAssistantSubtitle;
+
+  /// AI rail status shown while a scan is running.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning and collecting candidates'**
+  String get aiStatusScanning;
+
+  /// AI rail status shown after readable scan results are available.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to suggest cleanup from results'**
+  String get aiStatusReady;
+
+  /// AI rail status shown before the first readable scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Run a scan and I will find cleanup candidates'**
+  String get aiStatusRunScanFirst;
+
+  /// Section caption for the AI assistant message history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get aiHistorySection;
+
+  /// Placeholder text in the AI assistant chat input.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask about cleanup...'**
+  String get aiAskPlaceholder;
+
+  /// Author label for assistant messages in the AI rail.
+  ///
+  /// In en, this message translates to:
+  /// **'AI'**
+  String get aiAuthorAssistant;
+
+  /// Author label for user messages in the AI rail.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get aiAuthorUser;
+
+  /// Initial assistant message in the AI rail.
+  ///
+  /// In en, this message translates to:
+  /// **'I will keep the decision history and explain why a file is safe to touch or better to leave.'**
+  String get aiIntroMessage;
+
+  /// Seed user message shown in the AI rail conversation.
+  ///
+  /// In en, this message translates to:
+  /// **'What takes space and what is safe to clean?'**
+  String get aiUserStarterMessage;
+
+  /// Assistant advice shown after scan results are available.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with \"{focusName}\". Open large subfolders first, then add clear temporary files to the review list.'**
+  String aiSnapshotAdvice({required String focusName});
+
+  /// Assistant advice shown before scan results are available.
+  ///
+  /// In en, this message translates to:
+  /// **'After a scan I will show large folders, risk, and the safest next step.'**
+  String get aiNoSnapshotAdvice;
+
+  /// Title for the safe-mode hint in the AI rail.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe mode'**
+  String get aiSafeModeTitle;
+
+  /// Body text for the safe-mode hint in the AI rail.
+  ///
+  /// In en, this message translates to:
+  /// **'Do not delete folder roots immediately, only through the review list.'**
+  String get aiSafeModeText;
+
+  /// Title for the dialog-memory hint in the AI rail.
+  ///
+  /// In en, this message translates to:
+  /// **'Dialog memory'**
+  String get aiDialogMemoryTitle;
+
+  /// Body text for the dialog-memory hint in the AI rail.
+  ///
+  /// In en, this message translates to:
+  /// **'There is room here for a long conversation about the current disk.'**
+  String get aiDialogMemoryText;
 
   /// Localized string for nameColumn.
   ///

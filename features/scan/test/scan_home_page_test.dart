@@ -366,7 +366,10 @@ void main() {
     expect(find.text('TOTAL SCANNED'), findsOneWidget);
     expect(find.text('LARGEST FOLDER'), findsOneWidget);
     expect(find.text('Scanning'), findsNWidgets(4));
-    expect(find.textContaining('Сканирую'), findsOneWidget);
+    expect(
+      find.textContaining('Scanning and collecting candidates'),
+      findsOneWidget,
+    );
     expect(find.text('208214 files'), findsOneWidget);
     expect(find.text('Finding largest folders'), findsOneWidget);
     expect(find.text('Run a scan'), findsNothing);
@@ -566,7 +569,7 @@ void main() {
     final railSize = tester.getSize(find.byKey(const ValueKey('scan-ai-rail')));
     final tableRect = tester.getRect(find.byType(AppTreeTable));
 
-    expect(find.text('AI-помощник'), findsOneWidget);
+    expect(find.text('AI assistant'), findsOneWidget);
     expect(find.byKey(const ValueKey('scan-ai-chat-input')), findsOneWidget);
     expect(railSize.width, lessThanOrEqualTo(360));
     expect(tableRect.width, greaterThanOrEqualTo(760));
@@ -608,7 +611,7 @@ void main() {
 
     expect(find.byKey(const ValueKey('scan-ai-collapsed-rail')), findsNothing);
     expect(find.byKey(const ValueKey('scan-ai-chat-input')), findsOneWidget);
-    expect(find.text('AI-помощник'), findsOneWidget);
+    expect(find.text('AI assistant'), findsOneWidget);
   });
 
   testWidgets('wide toolbar gives search enough room on common desktop width', (
@@ -635,7 +638,12 @@ void main() {
     final scanRect = tester.getRect(
       find.byKey(const ValueKey('scan-toolbar-scan-action')),
     );
-    final scanLabel = tester.widget<Text>(find.text('Scan'));
+    final scanLabel = tester.widget<Text>(
+      find.descendant(
+        of: find.byKey(const ValueKey('scan-toolbar-scan-action')),
+        matching: find.text('Scan'),
+      ),
+    );
 
     expect(scanRect.left - targetRect.right, lessThanOrEqualTo(24));
     expect(scanRect.right, lessThan(720));
@@ -1605,8 +1613,8 @@ void main() {
       expect(find.text('Choose folder'), findsWidgets);
 
       final scanButton = tester.widget<FilledButton>(
-        find.ancestor(
-          of: find.text('Scan'),
+        find.descendant(
+          of: find.byKey(const ValueKey('scan-toolbar-scan-action')),
           matching: find.byType(FilledButton),
         ),
       );

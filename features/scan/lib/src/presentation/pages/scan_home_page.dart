@@ -1986,10 +1986,10 @@ class _AiAssistantRail extends StatelessWidget {
         : _formatSize(selected.size);
     final isRunning = store.sessionStatus?.state == SessionState.running;
     final statusText = isRunning
-        ? 'Сканирую и собираю кандидатов'
+        ? l10n.aiStatusScanning
         : store.hasReadableSnapshot
-        ? 'Готов подсказать по результатам'
-        : 'Запусти скан, потом разберу мусор';
+        ? l10n.aiStatusReady
+        : l10n.aiStatusRunScanFirst;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 14),
@@ -2017,13 +2017,13 @@ class _AiAssistantRail extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'AI-помощник',
+                      l10n.aiAssistantTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: _titleStyle(context),
                     ),
                     Text(
-                      'История очистки и подсказки',
+                      l10n.aiAssistantSubtitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: _bodyStyle(
@@ -2038,7 +2038,7 @@ class _AiAssistantRail extends StatelessWidget {
                 buttonKey: const ValueKey('scan-ai-collapse-action'),
                 icon: Icons.keyboard_double_arrow_left,
                 iconColor: _ScanColors.cyan,
-                tooltip: 'AI-помощник',
+                tooltip: l10n.aiAssistantTitle,
                 onTap: onCollapse,
               ),
             ],
@@ -2050,42 +2050,40 @@ class _AiAssistantRail extends StatelessWidget {
             status: statusText,
           ),
           const SizedBox(height: 16),
-          const _SectionCaption('ИСТОРИЯ'),
+          _SectionCaption(l10n.aiHistorySection.toUpperCase()),
           const SizedBox(height: 10),
           Expanded(
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
                 _AiMessageBubble(
-                  author: 'AI',
-                  text:
-                      'Я буду держать историю решений и объяснять, почему файл можно трогать или лучше оставить.',
+                  author: l10n.aiAuthorAssistant,
+                  text: l10n.aiIntroMessage,
                 ),
                 const SizedBox(height: 8),
-                const _AiMessageBubble(
-                  author: 'Ты',
-                  text: 'Что занимает место и что безопасно чистить?',
+                _AiMessageBubble(
+                  author: l10n.aiAuthorUser,
+                  text: l10n.aiUserStarterMessage,
                   user: true,
                 ),
                 const SizedBox(height: 8),
                 _AiMessageBubble(
-                  author: 'AI',
+                  author: l10n.aiAuthorAssistant,
                   text: store.hasReadableSnapshot
-                      ? 'Начни с "$focusName". Сначала открывай крупные подпапки, потом добавляй понятные временные файлы в список проверки.'
-                      : 'После скана покажу крупные папки, риск и безопасный следующий шаг.',
+                      ? l10n.aiSnapshotAdvice(focusName: focusName)
+                      : l10n.aiNoSnapshotAdvice,
                 ),
                 const SizedBox(height: 12),
                 _AiQuickHint(
                   icon: Icons.rule_folder_outlined,
-                  title: 'Безопасный режим',
-                  text:
-                      'Не удалять корни папок сразу, только через список проверки.',
+                  title: l10n.aiSafeModeTitle,
+                  text: l10n.aiSafeModeText,
                 ),
                 const SizedBox(height: 8),
                 _AiQuickHint(
                   icon: Icons.history,
-                  title: 'Память диалога',
-                  text: 'Здесь поместится длинная переписка по текущему диску.',
+                  title: l10n.aiDialogMemoryTitle,
+                  text: l10n.aiDialogMemoryText,
                 ),
               ],
             ),
@@ -2109,7 +2107,7 @@ class _AiAssistantRail extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    'Спросить про очистку...',
+                    l10n.aiAskPlaceholder,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: _bodyStyle(
@@ -2128,7 +2126,7 @@ class _AiAssistantRail extends StatelessWidget {
               child: FilledButton.icon(
                 onPressed: onScan,
                 icon: const Icon(Icons.play_arrow, size: 18),
-                label: const Text('Сканировать'),
+                label: Text(l10n.scanAction),
                 style: FilledButton.styleFrom(
                   backgroundColor: _ScanColors.cyan,
                   foregroundColor: _ScanColors.onPrimary,
@@ -2152,6 +2150,8 @@ class _CollapsedAiRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.cleanDiskL10n;
+
     return Container(
       key: const ValueKey('scan-ai-collapsed-rail'),
       width: _WideWorkspace._collapsedAssistantRailWidth,
@@ -2162,7 +2162,7 @@ class _CollapsedAiRail extends StatelessWidget {
           _PaneToggleAction(
             buttonKey: const ValueKey('scan-ai-expand-action'),
             icon: Icons.keyboard_double_arrow_right,
-            tooltip: 'AI-помощник',
+            tooltip: l10n.aiAssistantTitle,
             onTap: onExpand,
           ),
           const SizedBox(height: 8),
@@ -2170,7 +2170,7 @@ class _CollapsedAiRail extends StatelessWidget {
             buttonKey: const ValueKey('scan-ai-indicator-action'),
             icon: Icons.auto_awesome,
             iconColor: _ScanColors.cyan,
-            tooltip: 'AI-помощник',
+            tooltip: l10n.aiAssistantTitle,
             onTap: onExpand,
           ),
           const SizedBox(height: 14),
@@ -5611,7 +5611,7 @@ class _HeaderTargetMenu extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _SectionCaption('ОБЛАСТЬ СКАНИРОВАНИЯ'),
+            _SectionCaption(l10n.scanScopeSection.toUpperCase()),
             const SizedBox(height: 8),
             _HeaderTargetMenuCurrent(target: activeTarget),
             const SizedBox(height: 10),
@@ -5644,7 +5644,7 @@ class _HeaderTargetMenu extends StatelessWidget {
                   child: _FlatMenuAction(
                     key: const ValueKey('scan-target-menu-open-picker-action'),
                     icon: Icons.tune,
-                    label: 'Другой путь',
+                    label: l10n.targetOtherPathAction,
                     onTap: canPickTarget ? onPickTarget : null,
                   ),
                 ),
