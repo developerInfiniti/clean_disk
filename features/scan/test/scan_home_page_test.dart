@@ -239,7 +239,9 @@ void main() {
     'wide running footer stays dense while keeping progress and stats',
     (tester) async {
       final fixture = FakeScanFeatureFixture(
-        repository: FakeScanRepository()..deferStartCompletion = true,
+        repository: FakeScanRepository()
+          ..deferStartCompletion = true
+          ..emitStartScanEvents = false,
       );
       final result = await _pumpScanHome(
         tester,
@@ -270,7 +272,9 @@ void main() {
 
   testWidgets('footer stop action cancels a running scan', (tester) async {
     final fixture = FakeScanFeatureFixture(
-      repository: FakeScanRepository()..deferStartCompletion = true,
+      repository: FakeScanRepository()
+        ..deferStartCompletion = true
+        ..emitStartScanEvents = false,
     );
     final result = await _pumpScanHome(
       tester,
@@ -298,7 +302,9 @@ void main() {
     tester,
   ) async {
     final fixture = FakeScanFeatureFixture(
-      repository: FakeScanRepository()..deferStartCompletion = true,
+      repository: FakeScanRepository()
+        ..deferStartCompletion = true
+        ..emitStartScanEvents = false,
     );
     final result = await _pumpScanHome(
       tester,
@@ -370,7 +376,9 @@ void main() {
     tester,
   ) async {
     final fixture = FakeScanFeatureFixture(
-      repository: FakeScanRepository()..deferStartCompletion = true,
+      repository: FakeScanRepository()
+        ..deferStartCompletion = true
+        ..emitStartScanEvents = false,
     );
     final result = await _pumpScanHome(
       tester,
@@ -442,7 +450,9 @@ void main() {
     tester,
   ) async {
     final fixture = FakeScanFeatureFixture(
-      repository: FakeScanRepository()..deferStartCompletion = true,
+      repository: FakeScanRepository()
+        ..deferStartCompletion = true
+        ..emitStartScanEvents = false,
     );
     final result = await _pumpScanHome(
       tester,

@@ -199,9 +199,11 @@ final class FakeScanRepository implements ScanRepository {
       rootNodeIds: [_currentRootNodeId],
       progress: null,
     );
-    _status = deferStartCompletion && !emitStartScanEvents
-        ? running
-        : completed;
+    if (deferStartCompletion && !emitStartScanEvents) {
+      _status = running;
+    } else {
+      _status = completed;
+    }
 
     if (emitStartScanEvents) {
       _emit(ScanStarted(sessionId: _currentSessionId));
@@ -215,7 +217,7 @@ final class FakeScanRepository implements ScanRepository {
       );
     }
 
-    if (deferStartCompletion) {
+    if (deferStartCompletion && !emitStartScanEvents) {
       return Result.success(running);
     }
 
