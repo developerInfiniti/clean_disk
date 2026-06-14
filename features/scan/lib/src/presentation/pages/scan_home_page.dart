@@ -5766,13 +5766,22 @@ class _HeaderTargetMenuChoice extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
-                choice.target.path.value,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: _monoStyle(
-                  context,
-                ).copyWith(color: _ScanColors.textSoft, fontSize: 12),
+              Flexible(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 150),
+                    child: Text(
+                      choice.target.path.value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                      style: _monoStyle(
+                        context,
+                      ).copyWith(color: _ScanColors.textSoft, fontSize: 12),
+                    ),
+                  ),
+                ),
               ),
             ],
           ),

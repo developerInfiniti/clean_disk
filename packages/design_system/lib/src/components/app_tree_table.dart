@@ -519,22 +519,22 @@ class _AppTreeTableRowTile extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          SizedBox(
-                            width: 20,
-                            child: row.loading
-                                ? Center(
-                                    child: SizedBox(
-                                      width: 14,
-                                      height: 14,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: style.selectedProgressColor,
-                                      ),
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          const SizedBox(width: 6),
+                          if (row.loading) ...[
+                            SizedBox(
+                              width: 20,
+                              child: Center(
+                                child: SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: style.selectedProgressColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                          ],
                           Flexible(
                             child: Text(
                               row.sizeText,
@@ -555,6 +555,7 @@ class _AppTreeTableRowTile extends StatelessWidget {
                           builder: (context, constraints) {
                             final showProgressBar = constraints.maxWidth >= 80;
                             return Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 if (showProgressBar) ...[
                                   Expanded(
